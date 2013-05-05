@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if sketches %}
+    <ul>
+    {% for sketch in sketches %}
+        <li><a href="/sketch/{{ sketch.id }}/">{{ sketch.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No sketches are available.</p>
+{% endif %}
+
+{% endblock %}

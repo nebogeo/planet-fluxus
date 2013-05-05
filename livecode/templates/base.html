@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" />
+    <title>{% block title %}planet fluxus{% endblock %}</title>
+  </head>
+  <script src="{{ STATIC_URL }}js/jquery-1.9.1.min.js"></script>
+  <body>
+    <div id="content">
+	  {% block content %}{% endblock %}
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+@font-face {
+    font-family: 'deja';
+    src: url('../font/DejaVuSansMono.ttf');
+}
+
+html, body {
+    width:  100%;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    font-size: 20;
+    font-family: 'deja';
+}
+
+#content {
+    font-family: 'deja';
+    width: 70%;
+    padding: 15px;
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    margin: 0 auto;
+    font-size: 100%;
+}
+
+#id_code {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+//    font-family: 'deja'; important;
+    font-size: 200%;
+    border: 0;
+    color: #ffffff;
+    background-color: transparent;
+    z-index: 999;
+    width: 100%;
+    height: 100%;
+}
+
+#canvas {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    height: 100%;
+}
