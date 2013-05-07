@@ -19,5 +19,13 @@ def index(request):
 #                              {'sketch': sketch},
 #                              context_instance=RequestContext(request))
 
+def fork_sketch(require,pk):
+    sketch = Sketch.objects.get(pk=pk)
+    s = Sketch(code=sketch.code)
+    s.save()
+    return HttpResponse("hello");
+
+
+
 class SketchUpdate(UpdateView):
     model = Sketch

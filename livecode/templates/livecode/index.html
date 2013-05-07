@@ -5,7 +5,7 @@
 {% if sketches %}
     <ul>
     {% for sketch in sketches %}
-        <li><a href="/sketch/{{ sketch.id }}/">{{ sketch.name }}</a></li>
+        <li><a href="/sketch/{{ sketch.id }}/">{{ sketch.code }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

@@ -81,6 +81,8 @@
               (gl.getUniformLocation shader-program "uMVMatrix"))
         shader-program))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (define buffer
   (lambda (gl name data item-size)
     (list name data
@@ -89,28 +91,30 @@
 
 (define buffer-name (lambda (b) (list-ref b 0)))
 (define buffer-data (lambda (b) (list-ref b 1)))
+(define buffer-modify-data (lambda (b v) (list-replace b 1 v)))
 (define buffer-vb (lambda (b) (list-ref b 2)))
 
 (define buffer-update!
   (lambda (gl b)
     (update-buffer! gl (buffer-vb b) (buffer-data b))))
 
-(define primitive
-  (lambda (id size type matrix vb shader)
-    (list id size type matrix vb shader)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define primitive-id (lambda (p) (list-ref p 0)))
-(define primitive-size (lambda (p) (list-ref p 1)))
-(define primitive-type (lambda (p) (list-ref p 2)))
-(define primitive-tx (lambda (p) (list-ref p 3)))
-(define primitive-modify-tx (lambda (p v) (list-replace p 3 v)))
-(define primitive-vb (lambda (p) (list-ref p 4)))
-(define primitive-modify-vb (lambda (p v) (list-replace p 4 v)))
-(define primitive-shader (lambda (p) (list-ref p 5)))
+(define primitive
+  (lambda (size type matrix vb shader)
+    (list size type matrix vb shader)))
+
+(define primitive-size (lambda (p) (list-ref p 0)))
+(define primitive-type (lambda (p) (list-ref p 1)))
+(define primitive-tx (lambda (p) (list-ref p 2)))
+(define primitive-modify-tx (lambda (p v) (list-replace p 2 v)))
+(define primitive-vb (lambda (p) (list-ref p 3)))
+(define primitive-modify-vb (lambda (p v) (list-replace p 3 v)))
+(define primitive-shader (lambda (p) (list-ref p 4)))
 
 (define build-primitive
-  (lambda (gl id size vbs tx shader)
-    (let ((p (primitive id size 0 tx vbs shader)))
+  (lambda (gl size vbs tx shader)
+    (let ((p (primitive size 0 tx vbs shader)))
       (primitive-update-buffers! gl p)
       p)))
 
@@ -119,6 +123,23 @@
     (for-each
      (lambda (b)
        (buffer-update! gl b))
+     (primitive-vb p))))
+
+(define primitive-find-buffer
+  (lambda (p name)
+    (foldl
+     (lambda (b r)
+       (if (and (not r) (eq? (buffer-name b) name))
+           b r))
+     #f
+     (primitive-vb p))))
+
+(define primitive-modify-buffer
+  (lambda (p name fn)
+    (map
+     (lambda (b)
+       (if (eq? (buffer-name b) name)
+           (fn b) b))
      (primitive-vb p))))
 
 ;(define primitive-add-vb
@@ -187,6 +208,8 @@
           p gl (renderer-view renderer)))
        (renderer-list renderer)))))
 
+;;;;;;;;;;;;;;;;;
+
 (define vector
   (lambda (x y z)
     (list x y z)))
@@ -195,15 +218,47 @@
 (define vy (lambda (v) (list-ref v 1)))
 (define vz (lambda (v) (list-ref v 2)))
 
+
+;;;;;;;;;;;;;;;;;
+
+(define scene-node
+  (lambda (id prim state children)
+    (list id prim state children)))
+
+(define scene-node-id (lambda (n) (list-ref n 0)))
+(define scene-node-prim (lambda (n) (list-ref n 1)))
+(define scene-node-state (lambda (n) (list-ref n 2)))
+(define scene-node-children (lambda (n) (list-ref n 3)))
+(define scene-node-modify-children (lambda (n v) (list-replace n 3 v)))
+
+(define scene-node-add-child
+  (lambda (n c)
+    (scene-node-modify-children
+     n (cons c (scene-node-children n)))))
+
+(define scene-node-remove-child
+  (lambda (n id)
+    (scene-node-modify-children
+     n (filter
+        (lambda (c)
+          (not (eq? (scene-node-id c) id)))
+        (scene-node-children n)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (define state
   (lambda (gl)
     (list
      (mat4.identity (mat4.create))
      (build-shader
-      gl basic-vertex-shader basic-fragment-shader))))
+      gl basic-vertex-shader basic-fragment-shader)
+     #f)))
 
 (define state-tx (lambda (s) (list-ref s 0)))
 (define state-shader (lambda (s) (list-ref s 1)))
+(define state-prim (lambda (s) (list-ref s 2)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define _renderer 0)
 (define _state 0)
@@ -261,7 +316,7 @@
           (renderer-add
            _renderer
            (build-primitive
-            gl 0
+            gl
             (length unit-cube-vertices)
             (list
              (buffer gl "p" unit-cube-vertices 3)

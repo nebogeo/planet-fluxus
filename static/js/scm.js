@@ -263,15 +263,26 @@ zc.core_forms = function(fn, args) {
             "return _list_replace;\n})()\n";
     }
 
-    // iterative map version for optimisation
-    if (fn == "map_iter") {
+    // iterative build-list version for optimisation
+    if (fn == "build_list") {
         return "(function() {\n"+
-            "var _map_dst=[];\n"+
-            "var _map_src="+zc.comp(zc.cadr(args))+";\n"+
-            "var _map_fn="+zc.comp(zc.car(args))+";\n"+
-            "for (var _map_i; _map_i<_map_src.length; _map_i++) {\n"+
-            "_map_dst.push(_map_fn(_map_src[_map_i])); }\n"+
-            "return _map_dst; })()";
+            "var _build_list_l="+zc.comp(zc.car(args))+";\n"+
+            "var _build_list_fn="+zc.comp(zc.cadr(args))+";\n"+
+            "var _build_list_r= Array(_build_list_l);\n"+
+            "for (var _build_list_i=0; _build_list_i<_build_list_l; _build_list_i++) {\n"+
+            "_build_list_r[_build_list_i]=_build_list_fn(_build_list_i); }\n"+
+            "return _build_list_r; })()";
+    }
+
+    // iterative fold version for optimisation
+    if (fn == "foldl") {
+        return "(function() {\n"+
+            "var _foldl_fn="+zc.comp(zc.car(args))+";\n"+
+            "var _foldl_val="+zc.comp(zc.cadr(args))+";\n"+
+            "var _foldl_src="+zc.comp(zc.caddr(args))+";\n"+
+            "for (var _foldl_i=0; _foldl_i<_foldl_src.length; _foldl_i++) {\n"+
+            "_foldl_val=_foldl_fn(_foldl_src[_foldl_i],_foldl_val); }\n"+
+            "return _foldl_val; })()";
     }
 
     if (fn == "list_q") {
@@ -294,8 +305,20 @@ zc.core_forms = function(fn, args) {
         return "["+zc.comp(zc.car(args))+"].concat("+zc.comp(zc.cadr(args))+")";
     }
 
+    if (fn == "append") {
+        return zc.comp(zc.car(args))+".concat("+zc.comp(zc.cadr(args))+")";
+    }
+
     if (fn == "car") {
         return zc.comp(zc.car(args))+"[0]";
+    }
+
+    if (fn == "cadr") {
+        return zc.comp(zc.car(args))+"[1]";
+    }
+
+    if (fn == "caddr") {
+        return zc.comp(zc.car(args))+"[2]";
     }
 
     if (fn == "cdr") {
