@@ -436,6 +436,15 @@ zc.to_page = function(id,html)
 
 function init(id){
     var js=zc.load("/static/scm/base.scm");
+    js+=zc.load("/static/scm/webgl.scm");
+    js+=zc.load("/static/scm/maths.scm");
+    js+=zc.load("/static/scm/data.scm");
+    js+=zc.load("/static/scm/shaders.scm");
+    js+=zc.load("/static/scm/state.scm");
+    js+=zc.load("/static/scm/scene.scm");
+    js+=zc.load("/static/scm/primitive.scm");
+    js+=zc.load("/static/scm/renderer.scm");
+    js+=zc.load("/static/scm/fluxus.scm");
     js+=zc.load("/static/scm/gfx.scm");
     var el = document.getElementById(id);
     var code = el.innerHTML;
