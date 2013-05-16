@@ -5,3 +5,7 @@
 (define vx (lambda (v) (list-ref v 0)))
 (define vy (lambda (v) (list-ref v 1)))
 (define vz (lambda (v) (list-ref v 2)))
+
+(define vector-clone
+  (lambda (v)
+    (vector (vx v) (vy v) (vz v))))

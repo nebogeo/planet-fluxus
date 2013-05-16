@@ -1,5 +1,17 @@
 (define r 0)
 
+(define time
+  (lambda ()
+    (js "new Date().getTime();")))
+
+ (define push
+  (lambda ()
+    (set! r (renderer-stack-dup r))))
+
+(define pop
+  (lambda ()
+    (set! r (renderer-stack-pop r))))
+
 (define translate
   (lambda (v)
     (mat4.translate (renderer-top-tx r) v)))
