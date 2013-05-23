@@ -1,6 +1,6 @@
 # Create your views here.
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import Context, loader
 from livecode.models import Sketch
 from django.shortcuts import render_to_response
@@ -22,8 +22,8 @@ def index(request):
 def fork_sketch(require,pk):
     sketch = Sketch.objects.get(pk=pk)
     s = Sketch(code=sketch.code)
-    s.save()
-    return HttpResponse("hello");
+    r = s.save()
+    return HttpResponseRedirect("/sketch/"+str(s.pk));
 
 
 

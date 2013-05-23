@@ -4,13 +4,64 @@
 
 <script src="{{ STATIC_URL }}js/glMatrix.js"></script>
 <script src="{{ STATIC_URL }}js/scm.js"></script>
+<div id="top_bar">
+<a href="/">planet fluxus</a>
+<span style="font-size:50%">(ctrl x to save and run script)</span>
+<a href="#" id="output_link">messages</a>
+<a href="#" id="compiled_link">generated js</a>
+<a href="/fork_sketch/{{ sketch.id }}" style="color:red;">fork script</a>
 
+</div>
 <div>
+
 <canvas id="canvas" style="border: none;" width="1024" height="768"></canvas>
+
+<pre>
+<div id="output" ></div>
+<div id="compiled"</div>
+</pre>
+
+<script>
+$("#output").hide();
+$("#compiled").hide();
+
+var speed=400;
+
+$("#output_link").click(function() {
+    if ($("#output_link").html()=="messages") {
+        $("#id_code").hide(speed);
+        $("#output").show(speed);
+        $("#output_link").html("script");
+        $("#compiled_link").hide(speed);
+    } else {
+        $("#id_code").show(speed);
+        $("#output").hide(speed);
+        $("#output_link").html("messages");
+        $("#compiled_link").show(speed);
+    }
+});
+
+$("#compiled_link").click(function() {
+    if ($("#compiled_link").html()=="generated js") {
+        $("#id_code").hide(speed);
+        $("#compiled").show(speed);
+        $("#compiled_link").html("script");
+        $("#output_link").hide(speed);
+    } else {
+        $("#id_code").show(speed);
+        $("#compiled").hide(speed);
+        $("#compiled_link").html("generated js");
+        $("#output_link").show(speed);
+    }
+});
+
+</script>
+
+
 
 <form id="code" action="." method="POST">{% csrf_token %}
   {{ form.code }}<br/>
-  <input type="submit" value="Submit">
+  <!-- <input type="submit" value="Submit"> -->
 </form>
 </div>
 
@@ -22,14 +73,6 @@ $("textarea").keypress(function(event) {
     }
 });
 </script>
-
-<div style="clear:both;"></div>
-
-<h2>output</h2>
-<pre><div id="output"></div></pre>
-
-<h2>compiler</h2>
-<pre><div id="compiled"></div></pre>
 
 <script>init("id_code");</script>
 

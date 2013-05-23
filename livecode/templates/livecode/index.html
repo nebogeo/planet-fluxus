@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h2>(planet-fluxus) BETA</h2>
+
+<p>click on a script to run it, edit them or make your own by forking<br/>
+requires webgl and probably either firefox or chrome</a>
 
 {% if sketches %}
-    <ul>
     {% for sketch in sketches %}
-        <li><a href="/sketch/{{ sketch.id }}/">{{ sketch.code }}</a></li>
+        <p><a href="/sketch/{{ sketch.id }}/">{{ sketch.code }}</a></p>
     {% endfor %}
-    </ul>
 {% else %}
     <p>No sketches are available.</p>
 {% endif %}

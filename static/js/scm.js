@@ -1,4 +1,19 @@
+// Planet Fluxus Copyright (C) 2013 Dave Griffiths
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ///////////////////////////////////////////////////////////////////////////
+
 // a scheme compiler for javascript
 
 var zc = {};
@@ -107,7 +122,7 @@ zc.parse_tree = function(str) {
         i++;
     }
     return ret;
-}
+};
 
 zc.car = function(l) { return l[0]; };
 
@@ -122,11 +137,11 @@ zc.cdr = function(l) {
 
 zc.cadr = function(l) {
     return zc.car(zc.cdr(l));
-}
+};
 
 zc.caddr = function(l) {
     return zc.car(zc.cdr(zc.cdr(l)));
-}
+};
 
 zc.list_map = function(fn, l) {
     var r=[];
@@ -153,7 +168,7 @@ zc.infixify = function(jsfn, args) {
     var cargs = [];
     args.forEach(function(arg) { cargs.push(zc.comp(arg)); });
     return "("+cargs.join(" "+jsfn+" ")+")";
-}
+};
 
 zc.comp_lambda = function(args) {
     var expr=zc.cdr(args);
@@ -179,7 +194,7 @@ zc.comp_lambda = function(args) {
     return "function ("+zc.car(args).join()+")\n"+
         "{"+zc.list_map(zc.comp,eexpr).join("\n")+
         "\n"+lastc+"\n}\n";
-}
+};
 
 zc.comp_let = function(args) {
     var fargs = zc.car(args);
@@ -187,7 +202,7 @@ zc.comp_let = function(args) {
     fargs.forEach(function(a) { largs.push(a[0]); });
     return "("+zc.comp_lambda([largs].concat(zc.cdr(args)))+"("+
         zc.list_map(function(a) { return zc.comp(a[1]); },fargs)+" ))\n";
-}
+};
 
 zc.comp_cond = function(args) {
     if (zc.car(zc.car(args))==="else") {
@@ -197,7 +212,7 @@ zc.comp_cond = function(args) {
             zc.comp(zc.cadr(zc.car(args)))+"\n} else {\n"+
             zc.comp_cond(zc.cdr(args))+"\n}";
     }
-}
+};
 
 zc.comp_cond_return = function(args) {
     if (zc.car(zc.car(args))==="else") {
@@ -207,29 +222,29 @@ zc.comp_cond_return = function(args) {
             "return "+zc.comp(zc.cadr(zc.car(args)))+"\n} else {\n"+
             zc.comp_cond_return(zc.cdr(args))+"\n}";
     }
-}
+};
 
 zc.comp_if = function(args) {
     return "if ("+zc.comp(zc.car(args))+") {\n"+
         zc.comp(zc.cadr(args))+"} else {"+
         zc.comp(zc.caddr(args))+"}";
-}
+};
 
 zc.comp_if_return = function(args) {
     return "if ("+zc.comp(zc.car(args))+") {\n"+
         "return "+zc.comp(zc.cadr(args))+"} else {"+
         "return "+zc.comp(zc.caddr(args))+"}";
-}
+};
 
 zc.comp_when = function(args) {
     return "if ("+zc.comp(zc.car(args))+") {\n"+
         zc.comp(zc.cdr(args))+"}";
-}
+};
 
 zc.comp_when_return = function(args) {
     return "if ("+zc.comp(zc.car(args))+") {\n"+
-        "return "+zc.comp(zc.cadr(args))+"}";
-}
+        "return ("+zc.comp_lambda([[]].concat(zc.cdr(args)))+")() }";
+};
 
 zc.core_forms = function(fn, args) {
     // core forms
@@ -360,7 +375,7 @@ zc.core_forms = function(fn, args) {
     }
 
     return false;
-}
+};
 
 zc.char_is_number = function(c) {
     switch (c) {
@@ -375,11 +390,11 @@ zc.char_is_number = function(c) {
         case "8": return true; break;
         case "9": return true; break;
     }
-}
+};
 
 zc.is_number = function(str) {
     return zc.char_is_number(str[0]);
-}
+};
 
 zc.comp = function(f) {
 //    console.log(f);
@@ -409,7 +424,7 @@ zc.comp = function(f) {
         // plain list
         return zc.list_map(zc.comp,f).join("\n");
     }
-}
+};
 
 zc.compile_code = function(scheme_code) {
     var parse_tree=zc.parse_tree("("+scheme_code+")");
@@ -424,7 +439,7 @@ zc.load = function(url) {
     var str=xmlHttp.responseText;
     //console.log(zc.compile_code(str));
     return "\n/////////////////// "+url+"\n"+zc.compile_code(str)+"\n";
-}
+};
 
 zc.to_page = function(id,html)
 {
@@ -432,9 +447,9 @@ zc.to_page = function(id,html)
     div.id = "foo";
     div.innerHTML = html;
     document.getElementById(id).appendChild(div);
-}
+};
 
-function init(id){
+function init(id) {
     var js=zc.load("/static/scm/base.scm");
     js+=zc.load("/static/scm/webgl.scm");
     js+=zc.load("/static/scm/maths.scm");
