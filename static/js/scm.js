@@ -170,6 +170,18 @@ zc.infixify = function(jsfn, args) {
     return "("+cargs.join(" "+jsfn+" ")+")";
 };
 
+zc.check = function(fn,args,min,max) {
+    if (args.length<min) {
+        zc.to_page("output", fn+" has too few args ("+args+")");
+        return false;
+    }
+    if (max!=-1 && args.length>max) {
+        zc.to_page("output", fn+" has too many args ("+args+")");
+        return false;
+    }
+    return true;
+};
+
 zc.comp_lambda = function(args) {
     var expr=zc.cdr(args);
     var nexpr=expr.length;
@@ -248,14 +260,14 @@ zc.comp_when_return = function(args) {
 
 zc.core_forms = function(fn, args) {
     // core forms
-    if (fn == "lambda") return zc.comp_lambda(args);
-    if (fn == "if") return zc.comp_if(args);
-    if (fn == "when") return zc.comp_when(args);
-    if (fn == "cond") return zc.comp_cond(args);
-    if (fn == "let") return zc.comp_let(args);
+    if (fn == "lambda") if (zc.check(fn,args,2,-1)) return zc.comp_lambda(args);
+    if (fn == "if") if (zc.check(fn,args,3,3)) return zc.comp_if(args);
+    if (fn == "when") if (zc.check(fn,args,2,-1)) return zc.comp_when(args);
+    if (fn == "cond") if (zc.check(fn,args,2,-1)) return zc.comp_cond(args);
+    if (fn == "let") if (zc.check(fn,args,2,-1)) return zc.comp_let(args);
 
     if (fn == "define") {
-        return "var "+zc.car(args)+" = "+zc.comp(zc.cdr(args))+";";
+        if (zc.check(fn,args,2,-1)) return "var "+zc.car(args)+" = "+zc.comp(zc.cdr(args))+";";
     }
 
     if (fn == "list") {
@@ -267,11 +279,12 @@ zc.core_forms = function(fn, args) {
     }
 
     if (fn == "list_ref") {
-        return zc.comp(zc.car(args))+"["+zc.comp(zc.cadr(args))+"]";
+        if (zc.check(fn,args,2,2)) return zc.comp(zc.car(args))+"["+zc.comp(zc.cadr(args))+"]";
     }
 
     if (fn == "list_replace") {
-        return "(function() {"+
+        if (zc.check(fn,args,3,3))
+            return "(function() {"+
             "var _list_replace="+zc.comp(zc.car(args))+"\n"+
             "_list_replace["+zc.comp(zc.cadr(args))+"]="+
             zc.comp(zc.caddr(args))+";\n"+
@@ -280,7 +293,8 @@ zc.core_forms = function(fn, args) {
 
     // iterative build-list version for optimisation
     if (fn == "build_list") {
-        return "(function() {\n"+
+        if (zc.check(fn,args,2,2))
+            return "(function() {\n"+
             "var _build_list_l="+zc.comp(zc.car(args))+";\n"+
             "var _build_list_fn="+zc.comp(zc.cadr(args))+";\n"+
             "var _build_list_r= Array(_build_list_l);\n"+
@@ -291,7 +305,8 @@ zc.core_forms = function(fn, args) {
 
     // iterative fold version for optimisation
     if (fn == "foldl") {
-        return "(function() {\n"+
+        if (zc.check(fn,args,3,3))
+            return "(function() {\n"+
             "var _foldl_fn="+zc.comp(zc.car(args))+";\n"+
             "var _foldl_val="+zc.comp(zc.cadr(args))+";\n"+
             "var _foldl_src="+zc.comp(zc.caddr(args))+";\n"+
@@ -301,47 +316,62 @@ zc.core_forms = function(fn, args) {
     }
 
     if (fn == "list_q") {
-        return "(typeof "+zc.comp(zc.car(args))+"==='array')";
+        if (zc.check(fn,args,1,1))
+            return "(Object.prototype.toString.call("+
+            zc.comp(zc.car(args))+") === '[object Array]')";
     }
 
     if (fn == "length") {
-        return zc.comp(zc.car(args))+".length";
+        if (zc.check(fn,args,1,1)) return zc.comp(zc.car(args))+".length";
     }
 
     if (fn == "null_q") {
-        return "("+zc.comp(zc.car(args))+".length==0)";
+        if (zc.check(fn,args,1,1)) return "("+zc.comp(zc.car(args))+".length==0)";
     }
 
     if (fn == "not") {
-        return "!("+zc.comp(zc.car(args))+")";
+        if (zc.check(fn,args,1,1))
+            return "!("+zc.comp(zc.car(args))+")";
     }
 
     if (fn == "cons") {
-        return "["+zc.comp(zc.car(args))+"].concat("+zc.comp(zc.cadr(args))+")";
+        if (zc.check(fn,args,2,2))
+            return "["+zc.comp(zc.car(args))+"].concat("+zc.comp(zc.cadr(args))+")";
     }
 
     if (fn == "append") {
-        return zc.comp(zc.car(args))+".concat("+zc.comp(zc.cadr(args))+")";
+        if (zc.check(fn,args,1,-1)) {
+            var r=zc.comp(zc.car(args));
+            for (var i=1; i<args.length; i++) {
+                r+=".concat("+zc.comp(args[i])+")";
+            }
+            return r;
+        }
     }
 
     if (fn == "car") {
-        return zc.comp(zc.car(args))+"[0]";
+        if (zc.check(fn,args,1,1))
+            return zc.comp(zc.car(args))+"[0]";
     }
 
     if (fn == "cadr") {
-        return zc.comp(zc.car(args))+"[1]";
+        if (zc.check(fn,args,1,1))
+            return zc.comp(zc.car(args))+"[1]";
     }
 
     if (fn == "caddr") {
-        return zc.comp(zc.car(args))+"[2]";
+        if (zc.check(fn,args,1,1))
+            return zc.comp(zc.car(args))+"[2]";
     }
 
     if (fn == "cdr") {
-        return "zc.sublist("+zc.comp(zc.car(args))+",1)";
+        if (zc.check(fn,args,1,1))
+            return "zc.sublist("+zc.comp(zc.car(args))+",1)";
     }
 
     if (fn == "eq_q") {
-        return zc.comp(zc.car(args))+"=="+
+        if (zc.check(fn,args,2,2))
+            return zc.comp(zc.car(args))+"=="+
             zc.comp(zc.cadr(args));
     }
 
@@ -360,18 +390,22 @@ zc.core_forms = function(fn, args) {
     }
 
     if (fn == "set_e") {
-        return zc.comp(zc.car(args))+"="+zc.comp(zc.cadr(args));
+        if (zc.check(fn,args,2,2))
+            return zc.comp(zc.car(args))+"="+zc.comp(zc.cadr(args));
     }
 
     if (fn == "try") {
-        return "try {"+zc.comp(zc.car(args))+"} catch (e) { "+zc.comp(zc.cadr(args))+" }";
+        if (zc.check(fn,args,2,2))
+            return "try {"+zc.comp(zc.car(args))+"} catch (e) { "+zc.comp(zc.cadr(args))+" }";
     }
 
     // js intrinsics
     if (fn == "js") {
-        var v=zc.car(args);
-        // remove the quotes to insert the literal string
-        return v.substring(1,v.length-1);
+        if (zc.check(fn,args,1,1)) {
+            var v=zc.car(args);
+            // remove the quotes to insert the literal string
+            return v.substring(1,v.length-1);
+        }
     }
 
     return false;
@@ -390,6 +424,7 @@ zc.char_is_number = function(c) {
         case "8": return true; break;
         case "9": return true; break;
     }
+    return false;
 };
 
 zc.is_number = function(str) {
@@ -398,37 +433,47 @@ zc.is_number = function(str) {
 
 zc.comp = function(f) {
 //    console.log(f);
+    try {
+        // string, number or list?
+        if (typeof f == "string") return f;
 
-    // string, number or list?
-    if (typeof f == "string") return f;
+        // if null list
+        if (f.length==0) return "[]";
 
-    // if null list
-    if (f.length==0) return "[]";
+        // apply args to function
+        if (typeof zc.car(f) == "string") {
+            // if it's a number
+            if (zc.is_number(zc.car(f))) return zc.car(f);
+            if (zc.car(f)[0]=="\"") return zc.car(f);
 
-    // apply args to function
-    if (typeof zc.car(f) == "string") {
-        // if it's a number
-        if (zc.is_number(zc.car(f))) return zc.car(f);
-        if (zc.car(f)[0]=="\"") return zc.car(f);
+            var fn=zc.car(f);
+            var args=zc.cdr(f);
 
-        var fn=zc.car(f);
-        var args=zc.cdr(f);
+            // look for a core form
+            var r = zc.core_forms(fn,args);
+            if (r) return r;
 
-        // look for a core form
-        var r = zc.core_forms(fn,args);
-        if (r) return r;
-
-        // fallthrough to outer javascript environment
-        return fn+"("+zc.list_map(zc.comp,args).join()+")";
-    } else {
-        // plain list
-        return zc.list_map(zc.comp,f).join("\n");
+            // fallthrough to outer javascript environment
+            return fn+"("+zc.list_map(zc.comp,args).join()+")";
+        } else {
+            // plain list
+            return zc.list_map(zc.comp,f).join("\n");
+        }
+    } catch (e) {
+        zc.to_page("output", e);
+        zc.to_page("output", e.stack);
     }
 };
 
 zc.compile_code = function(scheme_code) {
     var parse_tree=zc.parse_tree("("+scheme_code+")");
     //console.log(parse_tree);
+    return zc.comp(do_syntax(parse_tree));
+};
+
+
+zc.compile_code_unparsed = function(scheme_code) {
+    var parse_tree=zc.parse_tree("("+scheme_code+")");
     return zc.comp(parse_tree);
 };
 
@@ -437,9 +482,17 @@ zc.load = function(url) {
     xmlHttp.open( "GET", url, false );
     xmlHttp.send( null );
     var str=xmlHttp.responseText;
-    //console.log(zc.compile_code(str));
     return "\n/////////////////// "+url+"\n"+zc.compile_code(str)+"\n";
 };
+
+zc.load_unparsed = function(url) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", url, false );
+    xmlHttp.send( null );
+    var str=xmlHttp.responseText;
+    return "\n/////////////////// "+url+"\n"+zc.compile_code_unparsed(str)+"\n";
+};
+
 
 zc.to_page = function(id,html)
 {
@@ -450,8 +503,16 @@ zc.to_page = function(id,html)
 };
 
 function init(id) {
+    // load and compile the syntax parser
+    var syntax_parse=zc.load_unparsed("/static/scm/syntax.scm");
+    try {
+        do_syntax=eval(syntax_parse);
+    } catch (e) {
+        zc.to_page("output",e);
+    }
     var js=zc.load("/static/scm/base.scm");
     js+=zc.load("/static/scm/webgl.scm");
+    js+=zc.load("/static/scm/texture.scm");
     js+=zc.load("/static/scm/maths.scm");
     js+=zc.load("/static/scm/data.scm");
     js+=zc.load("/static/scm/shaders.scm");
@@ -466,7 +527,12 @@ function init(id) {
     js += "\n///////////////// code from sketch follows\n";
     js += "\n"+zc.compile_code(code);
     zc.to_page("compiled",js);
-    eval(js);
+
+    try {
+        eval(js);
+    } catch (e) {
+        zc.to_page("output",e);
+    }
 }
 
 

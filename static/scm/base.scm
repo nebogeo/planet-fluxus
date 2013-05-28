@@ -90,6 +90,7 @@
 
 (define unit-test
   (lambda ()
+    (display "unit tests running...")
     (set! a 10)
     (when (not (eq? 4 4)) (display "eq? failed"))
     (when (eq? 2 4) (display "eq?(2) failed"))

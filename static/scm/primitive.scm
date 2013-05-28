@@ -64,10 +64,11 @@
 ;      p)))
 
 (define primitive-render
-  (lambda (p gl view camera local shader)
+  (lambda (p gl view camera local shader texture)
     (let ;; assumptions...
          ((pvb (buffer-vb (list-ref (primitive-vb p) 0)))
-          (nvb (buffer-vb (list-ref (primitive-vb p) 1))))
+          (nvb (buffer-vb (list-ref (primitive-vb p) 1)))
+          (tvb (buffer-vb (list-ref (primitive-vb p) 2))))
       (gl.useProgram shader)
       (gl.bindBuffer gl.ARRAY_BUFFER pvb)
       (gl.vertexAttribPointer shader.vertexPositionAttribute
@@ -77,21 +78,23 @@
       (gl.vertexAttribPointer shader.vertexNormalAttribute
                               nvb.itemSize
                               gl.FLOAT false 0 0)
+      (gl.bindBuffer gl.ARRAY_BUFFER tvb)
+      (gl.vertexAttribPointer shader.vertexTextureAttribute
+                              tvb.itemSize
+                              gl.FLOAT false 0 0)
 
+      (if (not (eq? texture ""))
+          (bind-texture gl shader texture)
+          (gl.bindTexture gl.TEXTURE_2D shader null))
 
-      (gl.uniform3fv shader.AmbientColour (vector 0.1 0.1 0.1))
-      (gl.uniform3fv shader.DiffuseColour (vector 0.5 0.5 0.7))
-      (gl.uniform3fv shader.SpecularColour (vector 1 1 1))
-      (gl.uniform3fv shader.LightPos (vector 0 100 0))
-      (gl.uniform1f shader.AmbientIntensity 1)
-      (gl.uniform1f shader.DiffuseIntensity 1)
-      (gl.uniform1f shader.SpecularIntensity 0)
+      (gl.uniform3fv shader.AmbientColour (vector 0 0 0))
+      (gl.uniform3fv shader.DiffuseColour (vector 1 1 1))
+      (gl.uniform3fv shader.SpecularColour (vector 0 0 0))
+      (gl.uniform3fv shader.LightPos (vector 0 0 0))
       (gl.uniform1f shader.Roughness 1)
 
       (gl.uniformMatrix4fv shader.ViewMatrixUniform false view)
       (gl.uniformMatrix4fv shader.CameraMatrixUniform false camera)
       (gl.uniformMatrix4fv shader.LocalMatrixUniform false local)
-      (let ((normal (mat4.create local)))
-        (mat4.inverse normal)
-        (gl.uniformMatrix4fv shader.NormalMatrixUniform false normal)
-        (gl.drawArrays gl.TRIANGLES 0 pvb.numItems)))))
+      (gl.uniformMatrix4fv shader.NormalMatrixUniform false local)
+      (gl.drawArrays gl.TRIANGLES 0 pvb.numItems))))

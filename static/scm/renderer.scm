@@ -62,13 +62,18 @@
   (lambda (r)
     (state-tx (renderer-stack-top r))))
 
+(define (renderer-modify-stack-top r fn)
+  (renderer-modify-stack
+   r (cons (fn (car (renderer-stack r)))
+           (cdr (renderer-stack r)))))
+
 (define renderer-immediate-add
   (lambda (r p)
     (renderer-modify-immediate-prims
      r (cons
         ;; state, and a primitive to render in
         (list (state-clone (renderer-stack-top r)) p)
-        (renderer-immediate-prims r)))))
+        (renderer-immediate-prims r)))))))
 
 (define renderer-immediate-clear
   (lambda (r)
@@ -83,7 +88,8 @@
       (mat4.perspective 45 (/ gl.viewportWidth gl.viewportHeight) 0.1 100.0
                         (renderer-view r))
 
-      (when hook (hook))
+
+      (when hook (try (hook) (display e)))
 
       ;; immediate mode
       (for-each
@@ -95,15 +101,16 @@
                              (renderer-camera r)
                              (state-tx state)
                              (state-shader state)
+                             (state-texture state)
                              )))
        (renderer-immediate-prims r))
 
       ;; retained mode
-;      (for-each
-;       (lambda (p)
-;         (primitive-render
-;          p gl (renderer-camera r) (renderer-view r)))
-;       (renderer-list r))
+                                        ;      (for-each
+                                        ;       (lambda (p)
+                                        ;         (primitive-render
+                                        ;          p gl (renderer-camera r) (renderer-view r)))
+                                        ;       (renderer-list r))
 
       (renderer-immediate-clear r))))
 
@@ -119,4 +126,5 @@
          (list
           (buffer gl "p" unit-cube-vertices 3)
           (buffer gl "n" unit-cube-normals 3)
+          (buffer gl "t" unit-cube-texcoords 3)
           )))))))
