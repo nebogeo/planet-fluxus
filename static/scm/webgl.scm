@@ -78,6 +78,10 @@
               (gl.getAttribLocation shader-program "n"))
         (gl.enableVertexAttribArray shader-program.vertexNormalAttribute)
 
+        (set! shader-program.vertexTextureAttribute
+              (gl.getAttribLocation shader-program "t"))
+        (gl.enableVertexAttribArray shader-program.vertexTextureAttribute)
+
         (set! shader-program.ViewMatrixUniform
               (gl.getUniformLocation shader-program "ViewMatrix"))
         (set! shader-program.CameraMatrixUniform

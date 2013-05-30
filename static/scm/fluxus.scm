@@ -41,7 +41,24 @@
   (lambda (v)
     (mat4.scale (renderer-top-tx r) v)))
 
-(define every-frame
+(define (load-texture name)
+  (load-texture-impl!
+   (renderer-gl r)
+   (+ "/static/textures/" name)))
+
+(define (texture name)
+  (set! r (renderer-modify-stack-top
+           r
+           (lambda (state)
+             (state-modify-texture state name)))))
+
+(define (colour col)
+  (set! r (renderer-modify-stack-top
+           r
+           (lambda (state)
+             (state-modify-colour state col)))))
+
+(define every-frame-impl
   (lambda (hook)
     (set! r (renderer-modify-hook r hook))))
 

@@ -22,15 +22,20 @@
       blinn-vertex-shader
       blinn-fragment-shader
       )
-     (vector 1 1 1))))
+     (vector 1 1 1)
+     "")))
 
 (define state-tx (lambda (s) (list-ref s 0)))
 (define state-shader (lambda (s) (list-ref s 1)))
 (define state-colour (lambda (s) (list-ref s 2)))
+(define state-modify-colour (lambda (s v) (list-replace s 2 v)))
+(define state-texture (lambda (s) (list-ref s 3)))
+(define state-modify-texture (lambda (s v) (list-replace s 3 v)))
 
 (define state-clone
   (lambda (s)
     (list
      (mat4.create (state-tx s))
      (state-shader s) ;; todo: shader clone
-     (vector-clone (state-colour s)))))
+     (vector-clone (state-colour s))
+     (state-texture s))))

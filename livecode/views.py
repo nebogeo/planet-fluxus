@@ -19,7 +19,12 @@ def index(request):
 #                              {'sketch': sketch},
 #                              context_instance=RequestContext(request))
 
-def fork_sketch(require,pk):
+def new_sketch(request):
+    s = Sketch(code="")
+    r = s.save()
+    return HttpResponseRedirect("/sketch/"+str(s.pk));
+
+def fork_sketch(request,pk):
     sketch = Sketch.objects.get(pk=pk)
     s = Sketch(code=sketch.code)
     r = s.save()
