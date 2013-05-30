@@ -50,14 +50,13 @@
   (set! r (renderer-modify-stack-top
            r
            (lambda (state)
-             (state-modify-texture
-              state name)))))
+             (state-modify-texture state name)))))
 
 (define (colour col)
   (set! r (renderer-modify-stack-top
            r
            (lambda (state)
-             (state-modify-colour col)))))
+             (state-modify-colour state col)))))
 
 (define every-frame-impl
   (lambda (hook)

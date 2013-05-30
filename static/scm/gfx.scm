@@ -33,6 +33,8 @@
         (set! r (renderer-build-prefab r))
         (gl.clearColor 0.0 0.0 0.0 1.0)
         (gl.enable gl.DEPTH_TEST)
+        ;; make sure the default texture is loaded
+        (load-texture "white.png")
         (crank)
         ))))
 

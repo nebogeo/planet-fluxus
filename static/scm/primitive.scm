@@ -64,11 +64,15 @@
 ;      p)))
 
 (define primitive-render
-  (lambda (p gl view camera local shader texture)
+  (lambda (p gl view camera state)
     (let ;; assumptions...
-         ((pvb (buffer-vb (list-ref (primitive-vb p) 0)))
-          (nvb (buffer-vb (list-ref (primitive-vb p) 1)))
-          (tvb (buffer-vb (list-ref (primitive-vb p) 2))))
+        ((local (state-tx state))
+         (shader (state-shader state))
+         (texture (state-texture state))
+         (colour (state-colour state))
+         (pvb (buffer-vb (list-ref (primitive-vb p) 0)))
+         (nvb (buffer-vb (list-ref (primitive-vb p) 1)))
+         (tvb (buffer-vb (list-ref (primitive-vb p) 2))))
       (gl.useProgram shader)
       (gl.bindBuffer gl.ARRAY_BUFFER pvb)
       (gl.vertexAttribPointer shader.vertexPositionAttribute
@@ -83,12 +87,12 @@
                               tvb.itemSize
                               gl.FLOAT false 0 0)
 
-      (if (not (eq? texture ""))
-          (bind-texture gl shader texture)
-          (gl.bindTexture gl.TEXTURE_2D shader null))
+      (if (eq? texture "")
+          (bind-texture gl shader "/static/textures/white.png")
+          (bind-texture gl shader texture))
 
       (gl.uniform3fv shader.AmbientColour (vector 0 0 0))
-      (gl.uniform3fv shader.DiffuseColour (vector 1 1 1))
+      (gl.uniform3fv shader.DiffuseColour colour)
       (gl.uniform3fv shader.SpecularColour (vector 0 0 0))
       (gl.uniform3fv shader.LightPos (vector 0 0 0))
       (gl.uniform1f shader.Roughness 1)

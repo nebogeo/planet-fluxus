@@ -88,6 +88,7 @@
       (mat4.perspective 45 (/ gl.viewportWidth gl.viewportHeight) 0.1 100.0
                         (renderer-view r))
 
+      (mat4.identity (renderer-top-tx r))
 
       (when hook (try (hook) (display e)))
 
@@ -99,10 +100,7 @@
            (primitive-render prim gl
                              (renderer-view r)
                              (renderer-camera r)
-                             (state-tx state)
-                             (state-shader state)
-                             (state-texture state)
-                             )))
+                             state)))
        (renderer-immediate-prims r))
 
       ;; retained mode

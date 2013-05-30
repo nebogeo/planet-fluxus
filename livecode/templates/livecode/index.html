@@ -6,6 +6,8 @@
 <p>click on a script to run it, edit them or make your own by forking<br/>
 requires webgl and probably either firefox or chrome</a>
 
+<p><a href="/new_sketch" style="color:red;">make a new script</a></p>
+
 {% if sketches %}
     {% for sketch in sketches %}
         <p><a href="/sketch/{{ sketch.id }}/">{{ sketch.code }}</a></p>

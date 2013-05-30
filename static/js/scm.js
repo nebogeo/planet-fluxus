@@ -204,7 +204,7 @@ zc.comp_lambda = function(args) {
     }
 
     return "function ("+zc.car(args).join()+")\n"+
-        "{"+zc.list_map(zc.comp,eexpr).join("\n")+
+        "{"+zc.list_map(zc.comp,eexpr).join(";\n")+
         "\n"+lastc+"\n}\n";
 };
 
@@ -383,7 +383,8 @@ zc.core_forms = function(fn, args) {
                  ["%","%"],
                  ["=","=="],
                  ["and","&&"],
-                 ["or","||"]];
+                 ["or","||"],
+                 ["modulo","%"]];
 
     for (var i=0; i<infix.length; i++) {
         if (fn == infix[i][0]) return zc.infixify(infix[i][1],args);
@@ -462,6 +463,7 @@ zc.comp = function(f) {
     } catch (e) {
         zc.to_page("output", e);
         zc.to_page("output", e.stack);
+        return "";
     }
 };
 
@@ -506,6 +508,7 @@ function init(id) {
     // load and compile the syntax parser
     var syntax_parse=zc.load_unparsed("/static/scm/syntax.scm");
     try {
+        console.log(syntax_parse);
         do_syntax=eval(syntax_parse);
     } catch (e) {
         zc.to_page("output",e);

@@ -37,7 +37,7 @@
             (gl.bindTexture gl.TEXTURE_2D null)
             (set! textures (cons (list name texture) textures))))
     (set! texture.image.src name)
-    (console.log "loading")
+    (console.log (+ "loading " name))
     name))
 
 (define (bind-texture gl shader name)

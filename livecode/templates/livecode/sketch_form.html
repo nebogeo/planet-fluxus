@@ -57,8 +57,6 @@ $("#compiled_link").click(function() {
 
 </script>
 
-
-
 <form id="code" action="." method="POST">{% csrf_token %}
   {{ form.code }}<br/>
   <!-- <input type="submit" value="Submit"> -->
@@ -66,12 +64,30 @@ $("#compiled_link").click(function() {
 </div>
 
 <script>
+var ctrl=false;
+
+// firefox
 $("textarea").keypress(function(event) {
-  if (event.ctrlKey && event.which == 120) {
+  if (ctrl && (event.which == 101 || event.which == 120)) {
         event.preventDefault();
         $("#code").submit();
     }
 });
+
+// chrome
+window.addEventListener("keydown", function(event) {
+  if (ctrl && (event.which == 69 || event.which == 88)) {
+        event.preventDefault();
+        $("#code").submit();
+    }
+
+  ctrl=event.ctrlKey;
+}, false);
+
+window.addEventListener("keyup", function(event) {
+  ctrl=event.ctrlKey;
+}, false);
+
 </script>
 
 <script>init("id_code");</script>

@@ -14,47 +14,45 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;; todo make data-driven and make define-syntax!
-(define do-syntax
-  (lambda (code)
-    (cond
-     ((not (list? code)) code)
-     ((null? code) ())
+(define ret (lambda (code)
+  (cond
+   ((not (list? code)) code)
+   ((null? code) ())
 
-     ;; with-state
-    ((eq? (car code) "with_state")
-     (append
-      (list "begin" (list "push"))
+   ;; with-state
+   ((eq? (car code) "with_state")
+    (append
+     (list "begin" (list "push"))
       (list (list "let"
                   (list (list "r" (append (list "begin") (do-syntax (cdr code)))))
                   (list "pop") "r"))))
 
-    ;; with-primitive
-    ((eq? (car code) "with_primitive")
-     (append
-      (list "begin" (list "grab" (cadr code)))
-      (list (list "let"
-                  (list (list "r" (append (list "begin") (do-syntax (cdr code)))))
-                  (list "ungrab") "r"))))
+   ;; with-primitive
+   ((eq? (car code) "with_primitive")
+    (append
+     (list "begin" (list "grab" (cadr code)))
+     (list (list "let"
+                 (list (list "r" (append (list "begin") (do-syntax (cdr code)))))
+                 (list "ungrab") "r"))))
 
-    ((eq? (car code) "every_frame")
-     (append
-      (list "every_frame_impl")
-      (list
-       (list "lambda" (list)
-             (do-syntax (cdr code))))))
+   ((eq? (car code) "every_frame")
+    (append
+     (list "every_frame_impl")
+     (list
+      (list "lambda" (list)
+            (do-syntax (cdr code))))))
 
 
-    ;; define a function
-    ((and
-      (eq? (car code) "define")
-      (list? (cadr code)))
-     (let ((name (car (cadr code)))
-           (args (cdr (cadr code)))
-           (body (do-syntax (cdr (cdr code)))))
-       (list "define" name (append (list "lambda" args) body))))
+   ;; define a function
+   ((and
+     (eq? (car code) "define")
+     (list? (cadr code)))
+    (let ((name (car (cadr code)))
+          (args (cdr (cadr code)))
+          (body (do-syntax (cdr (cdr code)))))
+      (list "define" name (append (list "lambda" args) body))))
 
-    (else (cons (do-syntax (car code))
-                (do-syntax (cdr code)))))))
+   (else (cons (do-syntax (car code))
+               (do-syntax (cdr code)))))))
 
-;; return the function so it can be run in outside context
-do-syntax
+ret
