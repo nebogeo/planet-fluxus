@@ -20,13 +20,13 @@ def index(request):
 #                              context_instance=RequestContext(request))
 
 def new_sketch(request):
-    s = Sketch(code="")
+    s = Sketch(code="", parent=0, locked=0)
     r = s.save()
     return HttpResponseRedirect("/sketch/"+str(s.pk));
 
 def fork_sketch(request,pk):
     sketch = Sketch.objects.get(pk=pk)
-    s = Sketch(code=sketch.code, parent=pk)
+    s = Sketch(code=sketch.code, parent=pk, locked=0)
     r = s.save()
     return HttpResponseRedirect("/sketch/"+str(s.pk));
 
