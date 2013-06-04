@@ -62,7 +62,7 @@ $("#compiled_link").click(function() {
 </script>
 
 <form id="code" action="." method="POST">{% csrf_token %}
-  {{ form.code }}<br/>
+  {{ form }}<br/>
   <!-- <input type="submit" value="Submit"> -->
 </form>
 </div>
@@ -77,7 +77,7 @@ if ({{ sketch.locked }}) {
 
     // firefox
     $("textarea").keypress(function(event) {
-      if (ctrl && (event.which == 101 || event.which == 120)) {
+      if (ctrl && (event.which == 101 /*|| event.which == 120*/)) {
             event.preventDefault();
             $("#code").submit();
         }
@@ -85,7 +85,7 @@ if ({{ sketch.locked }}) {
 
     // chrome
     window.addEventListener("keydown", function(event) {
-      if (ctrl && (event.which == 69 || event.which == 88)) {
+      if (ctrl && (event.which == 69 /*|| event.which == 88*/)) {
             event.preventDefault();
             $("#code").submit();
         }

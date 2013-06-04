@@ -64,6 +64,18 @@ a {
     height: 100%;
 }
 
+#id_parent {
+    visibility: hidden;
+}
+
+#id_locked {
+    visibility: hidden;
+}
+
+label {
+    visibility: hidden;
+}
+
 #canvas {
     position: absolute;
     left: 0px;

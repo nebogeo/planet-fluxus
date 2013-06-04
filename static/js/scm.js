@@ -469,7 +469,7 @@ zc.comp = function(f) {
 
 zc.compile_code = function(scheme_code) {
     var parse_tree=zc.parse_tree("("+scheme_code+")");
-    console.log(parse_tree);
+//    console.log(parse_tree);
     return zc.comp(do_syntax(parse_tree));
 };
 
@@ -508,7 +508,7 @@ function init(id) {
     // load and compile the syntax parser
     var syntax_parse=zc.load_unparsed("/static/scm/syntax.scm");
     try {
-        console.log(syntax_parse);
+//        console.log(syntax_parse);
         do_syntax=eval(syntax_parse);
     } catch (e) {
         zc.to_page("output",e);

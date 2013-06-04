@@ -32,3 +32,4 @@ def fork_sketch(request,pk):
 
 class SketchUpdate(UpdateView):
     model = Sketch
+    fields = ['code']
