@@ -3,6 +3,8 @@ from django.core.urlresolvers import reverse
 
 class Sketch(models.Model):
     code = models.TextField()
+    parent = models.IntegerField()
+    locked = models.IntegerField()
 
     def __unicode__(self):
         return self.code

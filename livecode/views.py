@@ -26,11 +26,9 @@ def new_sketch(request):
 
 def fork_sketch(request,pk):
     sketch = Sketch.objects.get(pk=pk)
-    s = Sketch(code=sketch.code)
+    s = Sketch(code=sketch.code, parent=pk)
     r = s.save()
     return HttpResponseRedirect("/sketch/"+str(s.pk));
-
-
 
 class SketchUpdate(UpdateView):
     model = Sketch
