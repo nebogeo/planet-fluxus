@@ -17,6 +17,10 @@
   (lambda (n)
     (= n 0)))
 
+(define (random n)
+  (Math.floor (* (Math.random) n)))
+
+
 ;; replaced by underlying iterative version
 ;;(define foldl
 ;;  (lambda (fn v l)

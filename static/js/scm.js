@@ -469,7 +469,7 @@ zc.comp = function(f) {
 
 zc.compile_code = function(scheme_code) {
     var parse_tree=zc.parse_tree("("+scheme_code+")");
-//    console.log(parse_tree);
+//    alert(JSON.stringify(do_syntax(parse_tree)));
     return zc.comp(do_syntax(parse_tree));
 };
 
