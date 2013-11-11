@@ -13,6 +13,8 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+(console.log "hello")
+
 (define renderer
   (lambda (gl)
     (list
@@ -90,7 +92,8 @@
 
       (mat4.identity (renderer-top-tx r))
 
-      (when hook (try (hook) (display e)))
+      (when hook (js "try{") (hook) (js "} catch(e) { ") (display e) (js "}"))
+;      (when hook (hook))
 
       ;; immediate mode
       (for-each
@@ -102,6 +105,8 @@
                              (renderer-camera r)
                              state)))
        (renderer-immediate-prims r))
+      (renderer-immediate-clear r))))
+
 
       ;; retained mode
                                         ;      (for-each
@@ -110,7 +115,6 @@
                                         ;          p gl (renderer-camera r) (renderer-view r)))
                                         ;       (renderer-list r))
 
-      (renderer-immediate-clear r))))
 
 (define renderer-build-prefab
   (lambda (r)
