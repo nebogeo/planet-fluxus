@@ -524,7 +524,7 @@ zc.to_page = function(id,html)
     document.getElementById(id).appendChild(div);
 };
 
-function init() {
+function init(id) {
 
     jQuery(document).ready(function($) {
 
