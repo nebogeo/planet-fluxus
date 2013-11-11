@@ -529,7 +529,7 @@ function init() {
     jQuery(document).ready(function($) {
 
         // load and compile the syntax parser
-        var syntax_parse=zc.load_unparsed("scm/syntax.scm");
+        var syntax_parse=zc.load_unparsed("/static/scm/syntax.scm");
         try {
             //        console.log(syntax_parse);
             do_syntax=eval(syntax_parse);
