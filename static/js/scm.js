@@ -182,32 +182,35 @@ zc.check = function(fn,args,min,max) {
     return true;
 };
 
+// ( (arg1 arg2 ...) body ...)
+
 zc.comp_lambda = function(args) {
     var expr=zc.cdr(args);
     var nexpr=expr.length;
     var last=expr[nexpr-1];
     var eexpr=zc.sublist(expr,0,nexpr-1);
-    var lastc="";
-
-    if (zc.car(last)=="cond") {
-        lastc=zc.comp_cond_return(zc.cdr(last));
-    } else {
-        if (zc.car(last)=="if") {
-            lastc=zc.comp_if_return(zc.cdr(last));
-        } else {
-            if (zc.car(last)=="when") {
-                lastc=zc.comp_when_return(zc.cdr(last));
-            } else {
-                lastc="return "+zc.comp(last);
-            }
-        }
-    }
 
     return "function ("+zc.car(args).join()+")\n"+
-        "{"+zc.list_map(zc.comp,eexpr).join(";\n")+
-        "\n"+lastc+"\n}\n";
+        // adding semicolon here
+        "{"+zc.list_map(zc.comp,eexpr).join(";\n")+"\n"+
+        "return "+zc.comp(last)+"\n}\n";
 };
 
+// ( body ... )
+// not used... yet
+zc.comp_begin = function(args) {
+    var expr=args;
+    var nexpr=expr.length;
+    var last=expr[nexpr-1];
+    var eexpr=zc.sublist(expr,0,nexpr-1);
+
+    return "function ()\n"+
+        // adding semicolon here
+        "{"+zc.list_map(zc.comp,eexpr).join(";\n")+"\n"+
+        "return "+zc.comp(last)+"\n}\n";
+}
+
+// ( ((arg1 exp1) (arg2 expr2) ...) body ...)
 zc.comp_let = function(args) {
     var fargs = zc.car(args);
     largs = [];
@@ -216,46 +219,31 @@ zc.comp_let = function(args) {
         zc.list_map(function(a) { return zc.comp(a[1]); },fargs)+" ))\n";
 };
 
+// ( ((pred) body ...)
+//   ((pred) body ...)
+//   (else body ... ))
+
 zc.comp_cond = function(args) {
     if (zc.car(zc.car(args))==="else") {
-        return zc.comp(zc.cdr(zc.car(args)));
+        return "(function () { return "+zc.comp(zc.cdr(zc.car(args)))+"})()";
     } else {
-        return "if ("+zc.comp(zc.car(zc.car(args)))+") {\n"+
-            zc.comp(zc.cadr(zc.car(args)))+"\n} else {\n"+
-            zc.comp_cond(zc.cdr(args))+"\n}";
-    }
-};
-
-zc.comp_cond_return = function(args) {
-    if (zc.car(zc.car(args))==="else") {
-        return "return "+zc.comp(zc.cdr(zc.car(args)));
-    } else {
-        return "if ("+zc.comp(zc.car(zc.car(args)))+") {\n"+
-            "return "+zc.comp(zc.cadr(zc.car(args)))+"\n} else {\n"+
-            zc.comp_cond_return(zc.cdr(args))+"\n}";
+        return "(function () { if ("+zc.comp(zc.car(zc.car(args)))+") {\n"+
+            // todo: decide if lambda, let or begin is canonical way to do this...
+            "return "+zc.comp_let([[]].concat(zc.cdr(zc.car(args))))+
+            "\n} else {\n"+
+            "return "+zc.comp_cond(zc.cdr(args))+"\n}})()";
     }
 };
 
 zc.comp_if = function(args) {
-    return "if ("+zc.comp(zc.car(args))+") {\n"+
-        zc.comp(zc.cadr(args))+"} else {"+
-        zc.comp(zc.caddr(args))+"}";
-};
-
-zc.comp_if_return = function(args) {
-    return "if ("+zc.comp(zc.car(args))+") {\n"+
+    return "(function () { if ("+zc.comp(zc.car(args))+") {\n"+
         "return "+zc.comp(zc.cadr(args))+"} else {"+
-        "return "+zc.comp(zc.caddr(args))+"}";
+        "return "+zc.comp(zc.caddr(args))+"}})()";
 };
 
 zc.comp_when = function(args) {
-    return "if ("+zc.comp(zc.car(args))+") {\n"+
-        zc.comp(zc.cdr(args))+"}";
-};
-
-zc.comp_when_return = function(args) {
-    return "if ("+zc.comp(zc.car(args))+") {\n"+
-        "return ("+zc.comp_lambda([[]].concat(zc.cdr(args)))+")() }";
+    return "(function () { if ("+zc.comp(zc.car(args))+") {\n"+
+        "return ("+zc.comp_lambda([[]].concat(zc.cdr(args)))+")() }})()";
 };
 
 zc.core_forms = function(fn, args) {
@@ -267,6 +255,7 @@ zc.core_forms = function(fn, args) {
     if (fn == "let") if (zc.check(fn,args,2,-1)) return zc.comp_let(args);
 
     if (fn == "define") {
+        // adding semicolon here
         if (zc.check(fn,args,2,-1)) return "var "+zc.car(args)+" = "+zc.comp(zc.cdr(args))+";";
     }
 
@@ -319,6 +308,21 @@ zc.core_forms = function(fn, args) {
         if (zc.check(fn,args,1,1))
             return "(Object.prototype.toString.call("+
             zc.comp(zc.car(args))+") === '[object Array]')";
+    }
+
+    if (fn == "number_q") {
+        if (zc.check(fn,args,1,1))
+            return "(typeof "+zc.comp(zc.car(args))+" === 'number')";
+    }
+
+    if (fn == "boolean_q") {
+        if (zc.check(fn,args,1,1))
+            return "(typeof "+zc.comp(zc.car(args))+" === 'boolean')";
+    }
+
+    if (fn == "string_q") {
+        if (zc.check(fn,args,1,1))
+            return "(typeof "+zc.comp(zc.car(args))+" === 'string')";
     }
 
     if (fn == "length") {
@@ -377,10 +381,15 @@ zc.core_forms = function(fn, args) {
 
 
     var infix = [["+","+"],
+                 ["string_append", "+"],
                  ["-","-"],
                  ["*","*"],
                  ["/","/"],
                  ["%","%"],
+                 ["<","<"],
+                 [">",">"],
+                 ["<=","<="],
+                 [">=",">="],
                  ["=","=="],
                  ["and","&&"],
                  ["or","||"],
@@ -400,6 +409,12 @@ zc.core_forms = function(fn, args) {
             return "try {"+zc.comp(zc.car(args))+"} catch (e) { "+zc.comp(zc.cadr(args))+" }";
     }
 
+    // heart of darkness
+    if (fn == "eval_string") {
+        if (zc.check(fn,args,1,1))
+            return "eval(zc.comp(zc.parse_tree("+zc.comp(zc.car(args))+")))";
+    }
+
     // js intrinsics
     if (fn == "js") {
         if (zc.check(fn,args,1,1)) {
@@ -407,6 +422,10 @@ zc.core_forms = function(fn, args) {
             // remove the quotes to insert the literal string
             return v.substring(1,v.length-1);
         }
+    }
+
+    if (fn == "new") {
+        return "new "+zc.car(args)+"( "+zc.comp(zc.cadr(args))+")";
     }
 
     return false;
@@ -461,6 +480,7 @@ zc.comp = function(f) {
             return zc.list_map(zc.comp,f).join("\n");
         }
     } catch (e) {
+        zc.to_page("output", "An error in parsing occured on "+f.toString());
         zc.to_page("output", e);
         zc.to_page("output", e.stack);
         return "";
@@ -504,38 +524,47 @@ zc.to_page = function(id,html)
     document.getElementById(id).appendChild(div);
 };
 
-function init(id) {
-    // load and compile the syntax parser
-    var syntax_parse=zc.load_unparsed("/static/scm/syntax.scm");
-    try {
-//        console.log(syntax_parse);
-        do_syntax=eval(syntax_parse);
-    } catch (e) {
-        zc.to_page("output",e);
-    }
-    var js=zc.load("/static/scm/base.scm");
-    js+=zc.load("/static/scm/webgl.scm");
-    js+=zc.load("/static/scm/texture.scm");
-    js+=zc.load("/static/scm/maths.scm");
-    js+=zc.load("/static/scm/data.scm");
-    js+=zc.load("/static/scm/shaders.scm");
-    js+=zc.load("/static/scm/state.scm");
-    js+=zc.load("/static/scm/scene.scm");
-    js+=zc.load("/static/scm/primitive.scm");
-    js+=zc.load("/static/scm/renderer.scm");
-    js+=zc.load("/static/scm/fluxus.scm");
-    js+=zc.load("/static/scm/gfx.scm");
-    var el = document.getElementById(id);
-    var code = el.innerHTML;
-    js += "\n///////////////// code from sketch follows\n";
-    js += "\n"+zc.compile_code(code);
-    zc.to_page("compiled",js);
+function init() {
 
-    try {
-        eval(js);
-    } catch (e) {
-        zc.to_page("output",e);
-    }
+    jQuery(document).ready(function($) {
+
+        // load and compile the syntax parser
+        var syntax_parse=zc.load_unparsed("scm/syntax.jscm");
+        try {
+            //        console.log(syntax_parse);
+            do_syntax=eval(syntax_parse);
+        } catch (e) {
+            zc.to_page("output", "An error occured parsing syntax of "+syntax_parse);
+            zc.to_page("output",e);
+            zc.to_page("output",e.stack);
+        }
+
+        var js=zc.load("/static/scm/base.scm");
+        js+=zc.load("/static/scm/webgl.scm");
+        js+=zc.load("/static/scm/texture.scm");
+        js+=zc.load("/static/scm/maths.scm");
+        js+=zc.load("/static/scm/data.scm");
+        js+=zc.load("/static/scm/shaders.scm");
+        js+=zc.load("/static/scm/state.scm");
+        js+=zc.load("/static/scm/scene.scm");
+        js+=zc.load("/static/scm/primitive.scm");
+        js+=zc.load("/static/scm/renderer.scm");
+        js+=zc.load("/static/scm/fluxus.scm");
+        js+=zc.load("/static/scm/gfx.scm");
+        var el = document.getElementById(id);
+        var code = el.innerHTML;
+        js += "\n///////////////// code from sketch follows\n";
+        js += "\n"+zc.compile_code(code);
+        zc.to_page("compiled",js);
+
+        try {
+            eval(js);
+        } catch (e) {
+            zc.to_page("output", "An error occured while evaluating ");
+            zc.to_page("output",e);
+            zc.to_page("output",e.stack);
+        }
+    });
 }
 
 
