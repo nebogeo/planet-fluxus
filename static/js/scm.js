@@ -97,7 +97,10 @@ zc.parse_tree = function(str) {
                     current_token="";
                 } else {
                     if (in_quotes) {
-                        current_token+=str[i];
+                        // escape newlines in quotes
+
+                        if (str[i]=="\n") current_token+=("\\"+str[i]);
+                        else current_token+=str[i];
                     } else {
                         switch (str[i]) {
                         case "-":
@@ -563,6 +566,7 @@ function init(id) {
             zc.to_page("output", "An error occured while evaluating (core) ");
             zc.to_page("output",e);
             zc.to_page("output",e.stack);
+            zc.to_page("compiled",js);
             return;
         }
 

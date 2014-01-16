@@ -67,48 +67,64 @@
         (gl.attachShader shader-program fragment-shader)
         (gl.linkProgram shader-program)
         (when (not (gl.getProgramParameter shader-program gl.LINK_STATUS))
-              (alert "could not initialise shaders"))
+            (alert (gl.getShaderInfoLog shader)))
         (gl.useProgram shader-program)
 
-        (set! shader-program.vertexPositionAttribute
-              (gl.getAttribLocation shader-program "p"))
-        (gl.enableVertexAttribArray shader-program.vertexPositionAttribute)
+        (when (not (eq? (gl.getAttribLocation shader-program "p") -1))
+              (set! shader-program.vertexPositionAttribute
+                    (gl.getAttribLocation shader-program "p"))
+              (gl.enableVertexAttribArray shader-program.vertexPositionAttribute))
 
-        (set! shader-program.vertexNormalAttribute
-              (gl.getAttribLocation shader-program "n"))
-        (gl.enableVertexAttribArray shader-program.vertexNormalAttribute)
+        (when (not (eq? (gl.getAttribLocation shader-program "n") -1))
+              (set! shader-program.vertexNormalAttribute
+                    (gl.getAttribLocation shader-program "n"))
+              (gl.enableVertexAttribArray shader-program.vertexNormalAttribute))
 
-        (set! shader-program.vertexTextureAttribute
-              (gl.getAttribLocation shader-program "t"))
-        (gl.enableVertexAttribArray shader-program.vertexTextureAttribute)
+        (when (not (eq? (gl.getAttribLocation shader-program "t") -1))
+              (set! shader-program.vertexTextureAttribute
+                    (gl.getAttribLocation shader-program "t"))
+              (gl.enableVertexAttribArray shader-program.vertexTextureAttribute))
 
-        (set! shader-program.ViewMatrixUniform
-              (gl.getUniformLocation shader-program "ViewMatrix"))
-        (set! shader-program.CameraMatrixUniform
-              (gl.getUniformLocation shader-program "CameraMatrix"))
-        (set! shader-program.LocalMatrixUniform
-              (gl.getUniformLocation shader-program "LocalMatrix"))
-        (set! shader-program.NormalMatrixUniform
-              (gl.getUniformLocation shader-program "NormalMatrix"))
+        (when (gl.getUniformLocation shader-program "ViewMatrix")
+              (set! shader-program.ViewMatrixUniform
+                    (gl.getUniformLocation shader-program "ViewMatrix")))
 
-        (set! shader-program.AmbientColour
-              (gl.getUniformLocation shader-program "AmbientColour"))
-        (set! shader-program.DiffuseColour
-              (gl.getUniformLocation shader-program "DiffuseColour"))
-        (set! shader-program.SpecularColour
-              (gl.getUniformLocation shader-program "SpecularColour"))
-        (set! shader-program.AmbientIntensity
-              (gl.getUniformLocation shader-program "AmbientIntensity"))
-        (set! shader-program.DiffuseIntensity
-              (gl.getUniformLocation shader-program "DiffuseIntensity"))
-        (set! shader-program.SpecularIntensity
-              (gl.getUniformLocation shader-program "SpecularIntensity"))
-        (set! shader-program.Roughness
-              (gl.getUniformLocation shader-program "Roughness"))
+        (when (gl.getUniformLocation shader-program "CameraMatrix")
+              (set! shader-program.CameraMatrixUniform
+                    (gl.getUniformLocation shader-program "CameraMatrix")))
 
-        (set! shader-program.LightPos
-              (gl.getUniformLocation shader-program "LightPos"))
+        (when (gl.getUniformLocation shader-program "LocalMatrix")
+              (set! shader-program.LocalMatrixUniform
+                    (gl.getUniformLocation shader-program "LocalMatrix")))
 
+        (when (gl.getUniformLocation shader-program "NormalMatrix")
+              (set! shader-program.NormalMatrixUniform
+                    (gl.getUniformLocation shader-program "NormalMatrix")))
+
+        (when (gl.getUniformLocation shader-program "NormalMatrix")
+              (set! shader-program.AmbientColour
+                    (gl.getUniformLocation shader-program "AmbientColour")))
+        (when (gl.getUniformLocation shader-program "DiffuseColour")
+              (set! shader-program.DiffuseColour
+                    (gl.getUniformLocation shader-program "DiffuseColour")))
+        (when (gl.getUniformLocation shader-program "SpecularColour")
+              (set! shader-program.SpecularColour
+                    (gl.getUniformLocation shader-program "SpecularColour")))
+        (when (gl.getUniformLocation shader-program "AmbientIntensity")
+              (set! shader-program.AmbientIntensity
+                    (gl.getUniformLocation shader-program "AmbientIntensity")))
+        (when (gl.getUniformLocation shader-program "DiffuseIntensity")
+              (set! shader-program.DiffuseIntensity
+                    (gl.getUniformLocation shader-program "DiffuseIntensity")))
+        (when (gl.getUniformLocation shader-program "SpecularIntensity")
+              (set! shader-program.SpecularIntensity
+                    (gl.getUniformLocation shader-program "SpecularIntensity")))
+        (when (gl.getUniformLocation shader-program "Roughness")
+              (set! shader-program.Roughness
+                    (gl.getUniformLocation shader-program "Roughness")))
+        (when (gl.getUniformLocation shader-program "LightPos")
+              (set! shader-program.LightPos
+                    (gl.getUniformLocation shader-program "LightPos")))
 
         shader-program))))
 

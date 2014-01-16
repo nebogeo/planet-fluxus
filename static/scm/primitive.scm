@@ -86,11 +86,9 @@
       (gl.vertexAttribPointer shader.vertexTextureAttribute
                               tvb.itemSize
                               gl.FLOAT false 0 0)
-
       (if (eq? texture "")
           (bind-texture gl shader "/static/textures/white.png")
           (bind-texture gl shader texture))
-
       (gl.uniform3fv shader.AmbientColour (vector 0 0 0))
       (gl.uniform3fv shader.DiffuseColour colour)
       (gl.uniform3fv shader.SpecularColour (vector 0 0 0))
