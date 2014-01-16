@@ -532,6 +532,8 @@ zc.to_page = function(id,html)
     document.getElementById(id).appendChild(div);
 };
 
+var corecode = "";
+
 function init(id) {
 
     jQuery(document).ready(function($) {
@@ -562,6 +564,7 @@ function init(id) {
 
         try {
             eval(js);
+            corecode=js;
         } catch (e) {
             zc.to_page("output", "An error occured while evaluating (core) ");
             zc.to_page("output",e);
@@ -586,6 +589,22 @@ function init(id) {
             zc.to_page("output",e.stack);
         }
     });
+}
+
+function flxeval(id) {
+        var js="";
+        var el = document.getElementById(id);
+        var code = $("#id_code").val();
+        js += "\n///////////////// code from sketch follows\n";
+        js += "\n"+zc.compile_code(code);
+        zc.to_page("compiled",js);
+        try {
+            eval(corecode+js);
+        } catch (e) {
+            zc.to_page("output", "An error occured while evaluating ");
+            zc.to_page("output",e);
+            zc.to_page("output",e.stack);
+        }
 }
 
 

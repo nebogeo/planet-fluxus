@@ -75,6 +75,13 @@ if ({{ sketch.locked }}) {
 } else {
     var ctrl=false;
 
+    $("#code").submit(function(){
+        $.post($(this).attr('action'), $(this).serialize(), function(res){
+            flxeval("id_code");
+        });
+        return false; // prevent default action
+    });
+
     // firefox
     $("textarea").keypress(function(event) {
       if (ctrl && (event.which == 101 /*|| event.which == 120*/)) {
@@ -89,7 +96,6 @@ if ({{ sketch.locked }}) {
             event.preventDefault();
             $("#code").submit();
         }
-
       ctrl=event.ctrlKey;
     }, false);
 
