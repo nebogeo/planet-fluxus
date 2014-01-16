@@ -90,7 +90,7 @@
 
       (mat4.identity (renderer-top-tx r))
 
-      (when hook (try (hook) (display e)))
+      (when hook (try (hook) (display e)) 0)
 
       ;; immediate mode
       (for-each

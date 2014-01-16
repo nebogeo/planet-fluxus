@@ -27,6 +27,7 @@
 
 (define state-tx (lambda (s) (list-ref s 0)))
 (define state-shader (lambda (s) (list-ref s 1)))
+(define state-modify-shader (lambda (s v) (list-replace s 1 v)))
 (define state-colour (lambda (s) (list-ref s 2)))
 (define state-modify-colour (lambda (s v) (list-replace s 2 v)))
 (define state-texture (lambda (s) (list-ref s 3)))

@@ -52,6 +52,14 @@
            (lambda (state)
              (state-modify-texture state name)))))
 
+(define (shader vert frag)
+  (set! r (renderer-modify-stack-top
+           r
+           (lambda (state)
+             (state-modify-shader
+              state
+              (build-shader (renderer-gl r) vert frag))))))
+
 (define (colour col)
   (set! r (renderer-modify-stack-top
            r
