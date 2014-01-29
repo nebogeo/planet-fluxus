@@ -4,6 +4,22 @@
 <div style="margin:1em; float:left; width:45%;">
 <h2>(planet-fluxus) BETA</h2>
 <p><i>"act of a flowing; a continuous moving on or passing by, as of a flowing stream; a continuous succession of changes"</i></p>
+
+<p><a href="/new_sketch" style="color:red;">make a new script</a></p>
+
+<p>example code</p>
+{% if sketches %}
+    {% for sketch in sketches %}
+        {% if sketch.locked %}
+            <p style='line-height: 50%'><a href="/sketch/{{ sketch.id }}/">{{ sketch.short }}</a></p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>No example sketches.</p>
+{% endif %}
+
+<p>about</p>
+
 <p><a href="http://toplap.org">livecode</a> webgl with <a href="http://en.wikipedia.org/wiki/Scheme_%28programming_language%29">scheme</a>. click on a script to the right to run it, edit them online and make new ones by forking</p>
 <p>incomplete and flakey, requires reading bits of generated javascript for debugging, and probably only works in selected versions of firefox or
 chrome. attempting to approximate <a href="http://www.pawfal.org/fluxus">fluxus</a></p>
@@ -14,16 +30,15 @@ chrome. attempting to approximate <a href="http://www.pawfal.org/fluxus">fluxus<
 <a href="http://www.i2off.org/flaxus/screen.html">flaxus</a></p>
 
 
-<p><a href="/new_sketch" style="color:red;">make a new script</a></p>
-
-<p><a href="https://github.com/nebogeo/planet-fluxus">source</a></p>
-<p><a href="http://www.pawfal.org/dave/blog/2013/06/planet-fluxus/">about</a></p>
+<p><a href="https://github.com/nebogeo/planet-fluxus">source</a>
+ <a href="http://www.pawfal.org/dave/blog/2013/06/planet-fluxus/">about</a></p>
 
 </div>
 <div style="margin:1em; float:right; width:45%;">
+<p>recent code</p>
 {% if sketches %}
     {% for sketch in sketches %}
-        <p><a href="/sketch/{{ sketch.id }}/">{{ sketch.code }}</a></p>
+        <p style='line-height: 50%'><a href="/sketch/{{ sketch.id }}/">{{ sketch.short }}</a></p>
     {% endfor %}
 {% else %}
     <p>No sketches are available.</p>

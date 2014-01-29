@@ -8,7 +8,9 @@ from django.template import RequestContext
 from django.views.generic.edit import UpdateView
 
 def index(request):
-    sketches = Sketch.objects.order_by('?')[:20]
+    sketches = Sketch.objects.order_by('id').reverse()[:20]
+    for sketch in sketches:
+        sketch.short=sketch.code.split('\n', 1)[0]+" ..."
     return render_to_response("livecode/index.html",
                               {'sketches': sketches},
                               context_instance=RequestContext(request))

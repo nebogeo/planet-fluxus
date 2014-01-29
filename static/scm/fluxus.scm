@@ -75,6 +75,21 @@
     (set! r (renderer-immediate-add
              r (list-ref (renderer-prefab r) 0)))))
 
+(define draw-sphere
+  (lambda ()
+    (set! r (renderer-immediate-add
+             r (list-ref (renderer-prefab r) 1)))))
+
+(define draw-torus
+  (lambda ()
+    (set! r (renderer-immediate-add
+             r (list-ref (renderer-prefab r) 2)))))
+
+(define draw-wp
+  (lambda ()
+    (set! r (renderer-immediate-add
+             r (list-ref (renderer-prefab r) 3)))))
+
 (define build-polygons
   (lambda (type count)
     (let ((gl (renderer-gl r)))
