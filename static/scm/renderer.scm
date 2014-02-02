@@ -131,7 +131,7 @@
           ))
         (build-primitive
          gl
-         (length unit-cube-vertices)
+         (length sphere-vertices)
          (list
           (buffer gl "p" sphere-vertices 3)
           (buffer gl "n" sphere-normals 3)
@@ -139,18 +139,10 @@
           ))
         (build-primitive
          gl
-         (length unit-cube-vertices)
+         (length torus-vertices)
          (list
           (buffer gl "p" torus-vertices 3)
           (buffer gl "n" torus-normals 3)
           (buffer gl "t" torus-texcoords 3)
-          ))
-        (build-primitive
-         gl
-         (length unit-cube-vertices)
-         (list
-          (buffer gl "p" wp-vertices 4)
-          (buffer gl "n" wp-normals 4)
-          (buffer gl "t" wp-texcoords 4)
           ))
         )))))

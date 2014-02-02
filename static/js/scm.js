@@ -562,7 +562,7 @@ function init(id) {
         js+=zc.load("/static/scm/fluxus.scm");
         js+=zc.load("/static/scm/gfx.scm");
 
-        try {
+       try {
             eval(js);
             corecode=js;
         } catch (e) {
@@ -582,7 +582,7 @@ function init(id) {
         zc.to_page("compiled",js);
 
         try {
-            eval(js);
+          eval(js);
         } catch (e) {
             zc.to_page("output", "An error occured while evaluating ");
             zc.to_page("output",e);
