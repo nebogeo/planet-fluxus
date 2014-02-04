@@ -8,11 +8,9 @@
 <p><a href="/new_sketch" style="color:red;">make a new script</a></p>
 
 <p>example code</p>
-{% if sketches %}
-    {% for sketch in sketches %}
-        {% if sketch.locked %}
-            <p style='line-height: 50%'><a href="/sketch/{{ sketch.id }}/">{{ sketch.short }}</a></p>
-        {% endif %}
+{% if examples %}
+    {% for example in examples %}
+          <p style='line-height: 50%'><a href="/sketch/{{ example.id }}/">{{ example.short }}</a></p>
     {% endfor %}
 {% else %}
     <p>No example sketches.</p>

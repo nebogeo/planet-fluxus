@@ -9,10 +9,17 @@ from django.views.generic.edit import UpdateView
 
 def index(request):
     sketches = Sketch.objects.order_by('id').reverse()[:20]
+    examples = Sketch.objects.filter(locked=1)
+
     for sketch in sketches:
         sketch.short=sketch.code.split('\n', 1)[0]+" ..."
+
+    for example in examples:
+        example.short=example.code.split('\n', 1)[0]+" ..."
+
     return render_to_response("livecode/index.html",
-                              {'sketches': sketches},
+                              {'sketches': sketches,
+                               'examples': examples},
                               context_instance=RequestContext(request))
 
 #def sketch(request,sketch_id):
